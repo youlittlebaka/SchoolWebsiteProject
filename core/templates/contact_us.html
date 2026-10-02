@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="info-page">
+  <div class="info-hero">
+    <img src="{% static 'images/contact-hero.svg' %}" alt="Contact our school" class="info-hero-image" />
+    <div>
+      <p class="info-kicker">Reach Our Team</p>
+      <h1 class="info-title">Contact Us</h1>
+      <p class="info-lead">
+        Need help with access, schedules, homework, enrollment, or technical issues? Contact us through any of the channels below.
+        For faster support, include your full name, role, and a clear summary of your request.
+      </p>
+      <div class="info-links">
+        <a class="info-link" href="{% url 'core:help' %}">Help</a>
+        <a class="info-link" href="{% url 'core:about_us' %}">About Us</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="contact-panel">
+    <article class="contact-block">
+      <h2>School Office</h2>
+      <p>
+        Address: 24 Learning Avenue, Education District, City Center
+      </p>
+      <p>
+        Office Hours: Sunday to Thursday, 08:00 AM to 03:30 PM
+      </p>
+      <p>
+        Main Phone: +1 (555) 102-4455
+      </p>
+      <p>
+        Admissions Desk: +1 (555) 102-4491
+      </p>
+      <p>
+        Email: office@schoolportal.edu
+      </p>
+    </article>
+
+    <article class="contact-block">
+      <h2>Portal & Technical Support</h2>
+      <p>
+        For login problems, missing schedule entries, permission issues, or page errors, contact technical support and include a screenshot.
+      </p>
+      <p>
+        Support Email: support@schoolportal.edu
+      </p>
+      <p>
+        Response Window: within one business day
+      </p>
+      <p>
+        When reporting issues, please include:
+      </p>
+      <ul class="contact-listing">
+        <li>Your role (student, parent, teacher, admin)</li>
+        <li>The page URL where the issue appears</li>
+        <li>Exact error message text if available</li>
+        <li>Steps that lead to the issue</li>
+      </ul>
+    </article>
+
+    <article class="contact-block">
+      <h2>Academic Coordination</h2>
+      <p>
+        For timetable conflicts, class assignment concerns, and homework clarification, contact the academic coordination team.
+      </p>
+      <p>
+        Coordination Email: academics@schoolportal.edu
+      </p>
+      <p>
+        Teacher Affairs: +1 (555) 102-4473
+      </p>
+      <p>
+        Student Affairs: +1 (555) 102-4478
+      </p>
+    </article>
+  </section>
+</section>
+{% endblock %}

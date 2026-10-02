@@ -1,0 +1,67 @@
+{% extends 'base.html'%} {% block content %}
+<div class="add-user-container">
+  <form method="post" action="{% url 'user:add_user'%}" class="add-user-form">
+    {% csrf_token %}
+    <h2>Add Your User Info</h2>
+    <input
+      type="text"
+      name="full_name"
+      placeholder="Full Name"
+      class="df-input"
+      required
+    />
+    <input
+      type="date"
+      name="date_born"
+      id=""
+      class="df-input"
+      placeholder="Dateborned"
+    />
+    <input
+      type="number"
+      name="national_id"
+      id=""
+      class="df-input"
+      placeholder="National_ID"
+    />
+    <input
+      type="text"
+      name="home_address"
+      id=""
+      class="df-input"
+      placeholder="Home Address"
+    />
+    <input
+      type="number"
+      name="phone"
+      id=""
+      class="df-input"
+      placeholder="Phone"
+    />
+    <input
+      type="number"
+      name="home_phone"
+      id=""
+      class="df-input"
+      placeholder="Home Phone"
+    />
+    <select name="gender" id="" class="df-input">
+      <option value="">Select Gender</option>
+      <option value="men">Male</option>
+      <option value="woman">Female</option>
+    </select>
+    <select name="role" id="" class="df-input">
+      <option value="">Select Role</option>
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="admin">Admin</option>
+      <option value="parent">parent</option>
+    </select>
+    <button class="df-btn" type="submit">Add User</button>
+    <h3>
+      Other informations can be added on <br />
+      after creating the User
+    </h3>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,210 @@
+{% extends 'base.html' %} {% block content %}
+<section class="schedule-shell">
+  <h2 class="schedule-title">{{ stage.name }} Weekly Schedule</h2>
+  {% if can_edit %}
+  <p class="schedule-subtitle">
+    Rows are days and columns are periods (max 4). Fill each slot and save.
+  </p>
+  <button type="button" class="classroom-menu-trigger" id="openClassroomMenu">
+    Add Homework
+  </button>
+  {% else %}
+  <p class="schedule-subtitle">
+    Rows are days and columns are periods (max 4). This view is read-only for
+    students.
+  </p>
+  {% endif %} {% if can_edit %}
+  <form method="post">
+    {% csrf_token %} {% endif %}
+    <div class="table-wrap">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Day \ Period</th>
+            {% for period in periods %}
+            <th>{{ period.name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in grid_rows %}
+          <tr>
+            <th>{{ row.day.name }}</th>
+            {% for cell in row.cells %}
+            <td>
+              {% if can_edit %}
+              <input
+                class="slot-input"
+                type="text"
+                name="{{ cell.field_name }}"
+                value="{{ cell.value }}"
+                placeholder="Math"
+              />
+              {% else %} {{ cell.value|default:"-" }} {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if can_edit %}
+    <button class="save-btn" type="submit">Save Schedule</button>
+    {% endif %} {% if can_edit %}
+  </form>
+  {% endif %}
+</section>
+
+<div class="homework-section">
+  <h2 class="homework-title">Homework Assignments</h2>
+  {% if homework_list %}
+  <ul class="homework-list">
+    {% for hw in homework_list %}
+    <li class="homework-item">
+      <h3 class="homework-subject">{{ hw.title }}</h3>
+      <p class="homework-desc">{{ hw.description }}</p>
+      <p class="homework-due">
+        Expires in:
+        <span
+          class="homework-expiry-timer"
+          data-created-at="{{ hw.created_at|date:'c' }}"
+        >
+          --
+        </span>
+      </p>
+    </li>
+
+    {% endfor %} {% else %}
+    <p class="no-homework">No homework assigned yet.</p>
+  </ul>
+  {% endif %}
+</div>
+
+{% if can_edit %}
+<div
+  class="classroom-menu-overlay"
+  id="classroomMenuOverlay"
+  aria-hidden="true"
+>
+  <div
+    class="classroom-menu-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Classroom Menu"
+  >
+    <div class="classroom-menu-head">
+      <h3 class="classroom-menu-title">Menu</h3>
+      <button
+        type="button"
+        class="classroom-menu-close"
+        id="closeClassroomMenu"
+      >
+        ×
+      </button>
+    </div>
+    <div class="classroom-menu-body">
+      <form
+        action="{% url 'students:add_homework' %}"
+        method="post"
+        class="homework-form"
+      >
+        {% csrf_token %}
+        <input
+          type="text"
+          name="title"
+          id=""
+          placeholder="Title"
+          class="df-input"
+        />
+
+        <input
+          type="text"
+          name=""
+          id=""
+          value="{{classroom.name}}"
+          class="df-input readonly"
+          readonly
+        />
+        <input type="hidden" name="classroom_id" value="{{ classroom.id }}" />
+        <input
+          type="text"
+          name="teacher"
+          id=""
+          value="{{ request.user.full_name }}"
+          class="df-input readonly"
+          readonly
+        />
+        <textarea
+          name="description"
+          id=""
+          placeholder="Description"
+          class="df-textarea"
+        ></textarea>
+        <button type="submit" class="df-btn">Add Homework</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  (function () {
+    const timers = document.querySelectorAll(".homework-expiry-timer");
+    if (!timers.length) return;
+
+    function formatRemaining(ms) {
+      if (ms <= 0) return "Expired";
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    function tick() {
+      const now = Date.now();
+      timers.forEach((node) => {
+        const createdAtRaw = node.dataset.createdAt;
+        const createdAtMs = Date.parse(createdAtRaw);
+        if (Number.isNaN(createdAtMs)) {
+          node.textContent = "--";
+          return;
+        }
+        const expiresAtMs = createdAtMs + 24 * 60 * 60 * 1000;
+        node.textContent = formatRemaining(expiresAtMs - now);
+      });
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  (function () {
+    const openBtn = document.getElementById("openClassroomMenu");
+    const closeBtn = document.getElementById("closeClassroomMenu");
+    const overlay = document.getElementById("classroomMenuOverlay");
+
+    if (!openBtn || !closeBtn || !overlay) return;
+
+    function openMenu() {
+      overlay.classList.add("is-open");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeMenu() {
+      overlay.classList.remove("is-open");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    openBtn.addEventListener("click", openMenu);
+    closeBtn.addEventListener("click", closeMenu);
+    overlay.addEventListener("click", function (event) {
+      if (event.target === overlay) closeMenu();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeMenu();
+    });
+  })();
+</script>
+{% endblock %}

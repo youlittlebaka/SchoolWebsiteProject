@@ -1,0 +1,95 @@
+{% extends 'base.html' %} {% block content %}
+<section class="student-detail-page">
+  <div class="student-detail-head">
+    <h1>{{ that_user.full_name }}</h1>
+    <a class="student-back-link" href="{% url 'user:all_students' %}"
+      >Back to all students</a
+    >
+  </div>
+
+  <div class="student-detail-grid">
+    <!-- Basic Info Card -->
+    <div class="student-detail-card">
+      <h2>Basic Info</h2>
+      <p><strong>National ID:</strong> {{ that_user.national_id }}</p>
+      <p><strong>Gender:</strong> {{ that_user.gender|default:"-" }}</p>
+      <p><strong>Age:</strong> {{ age|default:"-" }}</p>
+      <p><strong>Birth Date:</strong> {{ that_user.date_born}}</p>
+      <p>
+        <strong>Joined:</strong> {{ that_user.date_joined|date:"Y-m-d H:i" }}
+      </p>
+      <p><strong>Phone:</strong> {{ that_user.phone|default:"-" }}</p>
+      <p><strong>Home Phone:</strong> {{ that_user.home_phone|default:"-" }}</p>
+      <p><strong>Address:</strong> {{ that_user.home_address|default:"-" }}</p>
+    </div>
+
+    <!-- Academic Info Form -->
+    <form action="{% url 'user:profile_edit' that_user.pk%}" method="post">
+      {% csrf_token %}
+      <div class="student-detail-card">
+        <h2>Academic Info</h2>
+
+        {% if student_profile %}
+        <!-- Grade -->
+        {% if student_profile.grade %}
+        <p>
+          <strong>Grade:</strong> {{
+          student_profile.get_grade_display|default:"Not assigned" }}
+        </p>
+        {% endif %}
+
+        <!-- Classroom -->
+        <p><strong>Classroom:</strong></p>
+        <h2>{{ student_profile.class_room.name|default:"Not assigned" }}</h2>
+
+        <!-- Teacher -->
+        <p><strong>Teacher:</strong></p>
+        {% if student_profile.class_room.teacher.all %}
+        <ul>
+          {% for teacher in student_profile.class_room.teacher.all %}
+          <li>{{ teacher.user.full_name }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p>No teacher assigned yet.</p>
+        {% endif %}
+
+        <!-- Lessons -->
+        {% if student_profile.lessons.count > 0 %}
+        <p><strong>Subjects:</strong></p>
+        <ul>
+          {% for lesson in student_profile.lessons.all %}
+          <li>{{ lesson.name }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p>No subjects assigned yet.</p>
+        {% endif %} {% else %}
+        <p>No student profile data yet.</p>
+        {% endif %}
+      </div>
+    </form>
+
+    <!-- Emergency Contacts Card -->
+    <div class="student-detail-card">
+      <h2>Emergency Contacts</h2>
+      {% if student_parents %} {% for parent in student_parents %}
+      <p>
+        <strong>{{ parent.parent_type|title }}:</strong> {{
+        parent.user.full_name }} ({{ parent.user.phone|default:"-" }})
+      </p>
+      {% endfor %} {% else %}
+      <p>No emergency contacts assigned.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Remove Student Form -->
+  <form action="{% url 'user:remove_user' that_user.id %}" method="post">
+    {% csrf_token %}
+    <button style="margin-top: 20px" class="danger-btn" type="submit">
+      Remove
+    </button>
+  </form>
+</section>
+{% endblock %}

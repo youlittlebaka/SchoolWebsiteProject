@@ -1,0 +1,156 @@
+{% extends 'base.html' %}{% block content %}
+<div class="pf-card">
+  <div class="pf-items">
+    <div class="pfp-section">
+      {% if the_user.pfp %}
+      <img src="{{ the_user.pfp.url }}" alt="Profile Picture" class="pfp" />
+      {% else %}
+      <div class="no-pfp">
+        <span class="no-pfp-text">{{ the_user.full_name|slice:":2" }}</span>
+      </div>
+      {% endif %}
+      <div class="badges">
+        <h2 class="role-badge">{{ user.role }}</h2>
+        {% if user.is_active %}
+        <h2 class="active-badge">Active</h2>
+        {% else %}
+        <h2 class="disactive-badge">Disactive</h2>
+        {% endif %}
+      </div>
+      <div class="action-buttons">
+        {% if user.role == 'admin'%}
+        <a href="{% url 'user:profile_edit' the_user.pk %}" class="edit-btn"
+          >Change Profile</a
+        >
+        {% else %}
+        <form action="{% url 'user:edit_profile' the_user.pk %}" method="post">
+          <input type="file" name="pfp" class="file-input" />
+        </form>
+        {% endif %}
+        <form action="{% url 'user:logout'%}" method="post">
+          {% csrf_token %}
+          <button class="danger-btn" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="user-info">
+      <h1 class="fullname-row">{{ the_user.full_name }}</h1>
+      <h2 class="info-title">Contact info</h2>
+      <h3 class="info">Phone number :{{ the_user.phone }}</h3>
+      <h3 class="info">Home phone number :{{ the_user.home_phone }}</h3>
+      <h2 class="info-title">Dates</h2>
+      <h3 class="info">Birth date : {{ the_user.date_born }}</h3>
+      <h3 class="info">Join date : {{ the_user.date_joined }}</h3>
+
+      <h2 class="info-title">Other info</h2>
+      <h3 class="info">Gender : {{ the_user.gender }}</h3>
+      <h3 class="info">National ID : {{ the_user.national_id }}</h3>
+      {% if user.is_teacher and teacher_profile %}
+      <h3 class="info">
+        Education : {{ teacher_profile.get_education_display|default:"Not
+        assigned" }}
+      </h3>
+      {% endif %}
+
+      <section class="profile-section">
+        <h2 class="section-title">Academic Summary</h2>
+        {% if the_user.is_teacher and teacher_profile %}
+        <div class="section-grid">
+          <div class="section-item">
+            <p class="section-label">Subject</p>
+            <p class="section-value">
+              {{ teacher_profile.get_education_display|default:"Not assigned" }}
+            </p>
+          </div>
+          <div class="section-item">
+            <p class="section-label">Students</p>
+            <p class="section-value">{{ teacher_profile.students.count }}</p>
+          </div>
+          <div class="section-item">
+            <p class="section-label">Classrooms</p>
+            <p class="section-value">{{ teacher_profile.classrooms.count }}</p>
+          </div>
+        </div>
+        {% elif the_user.is_student and student_profile %}
+        <div class="section-grid">
+          <div class="section-item">
+            <p class="section-label">Grade</p>
+            <p class="section-value">
+              {{ student_profile.get_grade_display|default:"Not assigned" }}
+            </p>
+          </div>
+          <div class="section-item">
+            <p class="section-label">Classroom</p>
+            <p class="section-value">
+              {{ student_profile.class_room.name|default:"Not assigned" }}
+            </p>
+          </div>
+          <div class="section-item">
+            <p class="section-label">Homeroom Teacher</p>
+            <p class="section-value">
+              {{ student_profile.teacher.user.full_name|default:"Not assigned"
+              }}
+            </p>
+          </div>
+          <div class="section-item">
+            <p class="section-label">Subjects</p>
+            <p class="section-value">{{ student_profile.lessons.count }}</p>
+          </div>
+        </div>
+        {% else %}
+        <p class="section-empty">No academic profile data yet.</p>
+        {% endif %}
+      </section>
+
+      <section class="profile-section">
+        <h2 class="section-title">Recent Activity</h2>
+        <div class="section-grid">
+          <div class="section-item">
+            <p class="section-label">Account Status</p>
+            <p class="section-value">
+              {% if the_user.is_active %}Active{% else %}Inactive{% endif %}
+            </p>
+          </div>
+          <div class="section-item">
+            <p class="section-label">Joined</p>
+            <p class="section-value">
+              {{ the_user.date_joined|date:"M d, Y - H:i" }}
+            </p>
+          </div>
+          <div class="section-item">
+            <p class="section-label">Last Login</p>
+            <p class="section-value">
+              {{ the_user.last_login|date:"M d, Y - H:i" }}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {% if the_user.is_student %}
+      <section class="profile-section">
+        <h2 class="section-title">Emergency Contacts</h2>
+        {% if student_parents %}
+        <div class="contact-list">
+          {% for parent in student_parents %}
+          <div class="contact-card">
+            <p class="contact-name">{{ parent.user.full_name }}</p>
+            <p class="contact-meta">{{ parent.parent_type|title }}</p>
+            <p class="contact-meta">
+              Phone: {{ parent.user.phone|default:"-" }}
+            </p>
+            <p class="contact-meta">
+              Home: {{ parent.user.home_phone|default:"-" }}
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="section-empty">No emergency contacts assigned yet.</p>
+        {% endif %}
+      </section>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

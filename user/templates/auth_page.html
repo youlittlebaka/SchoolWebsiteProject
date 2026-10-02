@@ -1,0 +1,67 @@
+{% extends 'base.html'%} {% block content %}
+<div class="form-container">
+  <form action="{% url 'user:login'%}" method="post" class="auth-form">
+    {% csrf_token %}
+    <h1>Authentication Page</h1>
+    <p>Enter your National ID and Password to log in.</p>
+    <div class="form-field">
+      <label for="national_id">National ID</label>
+      <input
+        type="number"
+        name="national_id"
+        id="national_id"
+        class="df-input"
+        placeholder="Enter your National ID"
+        inputmode="numeric"
+        autocomplete="username"
+        required
+      />
+      <small class="field-help">Your National ID is usually 10 digits.</small>
+    </div>
+    <div class="form-field">
+      <label for="password">Password</label>
+      <div class="password-row">
+        <input
+          type="password"
+          name="password"
+          id="password"
+          class="df-input"
+          placeholder="Enter your Password"
+          autocomplete="current-password"
+          required
+        />
+        <button type="button" class="toggle-password" data-toggle="password">
+          Show
+        </button>
+      </div>
+      <small class="field-help">Keep your password private.</small>
+    </div>
+    <div class="form-row">
+      <label class="checkbox">
+        <input type="checkbox" name="remember_me" />
+        <span>Remember me</span>
+      </label>
+      <a class="form-link" href="#">Forgot password?</a>
+    </div>
+    <button type="submit" class="df-btn">Submit</button>
+    <p class="form-note">
+      By signing in, you agree to the school usage policy.
+    </p>
+    <div class="form-links">
+      <span>New here?</span>
+      <a class="form-link" href="#">Need help?</a>
+    </div>
+  </form>
+</div>
+<script>
+  const toggleBtn = document.querySelector('[data-toggle="password"]');
+  const passwordInput = document.getElementById("password");
+  if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener("click", () => {
+      const isHidden = passwordInput.type === "password";
+      passwordInput.type = isHidden ? "text" : "password";
+      toggleBtn.textContent = isHidden ? "Hide" : "Show";
+    });
+  }
+</script>
+{% endblock %}

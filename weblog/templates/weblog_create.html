@@ -1,0 +1,92 @@
+{% extends 'base.html' %} {% block content %}
+<section class="weblog-create-shell">
+  <div class="weblog-create-card">
+    <p class="weblog-create-kicker">School Publishing Desk</p>
+    <h1 class="weblog-create-title">Create New Weblog Post</h1>
+    <p class="weblog-create-subtitle">
+      Fill all required fields and publish when the post is ready for everyone.
+    </p>
+
+    <form
+      method="post"
+      enctype="multipart/form-data"
+      class="weblog-create-form"
+    >
+      {% csrf_token %}
+
+      <label class="weblog-field">
+        <span class="weblog-field-label">Title *</span>
+        <input
+          type="text"
+          name="title"
+          placeholder="Enter a clear post title"
+          class="weblog-field-input"
+          maxlength="200"
+          required
+        />
+      </label>
+
+      <label class="weblog-field">
+        <span class="weblog-field-label">Category *</span>
+        <select name="category" class="weblog-field-input" required>
+          <option value="">Select category</option>
+          <option value="announcement">Announcement</option>
+          <option value="news">News</option>
+          <option value="event">Event</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <label class="weblog-field">
+        <span class="weblog-field-label">Content *</span>
+        <textarea
+          name="content"
+          id="content"
+          class="weblog-field-textarea"
+          placeholder="Write your post content..."
+          rows="6"
+          required
+        ></textarea>
+      </label>
+
+      <label class="weblog-field">
+        <span class="weblog-field-label">Attachment (optional)</span>
+        <input type="file" name="file" class="weblog-field-input-file" />
+      </label>
+
+      <label class="weblog-publish-row">
+        <input type="checkbox" name="published" />
+        <span>Publish now</span>
+      </label>
+
+      <div class="weblog-create-actions">
+        <button type="submit" class="weblog-create-btn">Create Post</button>
+        <a href="{% url 'weblog:weblog' %}" class="weblog-create-cancel"
+          >Back to Weblog</a
+        >
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const textarea = document.getElementById("content");
+    if (!textarea) return;
+
+    textarea.style.overflowY = "hidden";
+    textarea.style.resize = "none";
+
+    function autoGrow(el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+
+    textarea.addEventListener("input", function () {
+      autoGrow(textarea);
+    });
+
+    autoGrow(textarea);
+  })();
+</script>
+{% endblock %}

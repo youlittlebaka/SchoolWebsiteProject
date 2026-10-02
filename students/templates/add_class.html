@@ -1,0 +1,48 @@
+{% extends 'base.html' %}{% block content %}
+<div class="form-container">
+  <form
+    class="add-form"
+    action="{% url 'students:add_classroom' %}"
+    method="post"
+  >
+    {% csrf_token %}
+    <h2 class="form-welcome">Add New Classroom</h2>
+    <input
+      class="df-input"
+      type="text"
+      name="name"
+      id="name"
+      placeholder="Classroom Name"
+      required
+    />
+    <input
+      type="text"
+      name="class_grade"
+      id="class_grade"
+      placeholder="Class Grade"
+      class="df-input"
+    />
+    <select name="teachers" id="teachers" class="df-input">
+      <option value="" selected>select teacher</option>
+      {% for teacher in all_teachers %}
+      <option value="{{ teacher.pk }}">{{ teacher.user.full_name }}</option>
+      {% endfor %}
+    </select>
+    <select multiple name="students" id="students" class="df-input">
+      {% for student in all_students %}
+      <option value="{{ student.pk }}">{{ student.user.full_name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="df-btn">Add Classroom</button>
+    <h4>If needed read <a href="{% url 'core:help'%}">Help</a> article</h4>
+  </form>
+</div>
+<script>
+  $(document).ready(function () {
+    $("#students").select2({
+      placeholder: "Select students",
+      allowClear: true,
+    });
+  });
+</script>
+{% endblock %}

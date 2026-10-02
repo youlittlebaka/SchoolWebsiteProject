@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="info-page">
+  <div class="info-hero">
+    <img src="{% static 'images/help-hero.svg' %}" alt="Help and support" class="info-hero-image" />
+    <div>
+      <p class="info-kicker">Support Center</p>
+      <h1 class="info-title">Help</h1>
+      <p class="info-lead">
+        This page answers the most common questions students, parents, teachers, and staff ask when using the school portal.
+        If you are not sure where to begin, start with the account and classroom sections below.
+      </p>
+      <div class="info-links">
+        <a class="info-link" href="{% url 'core:about_us' %}">About Us</a>
+        <a class="info-link" href="{% url 'core:contact_us' %}">Contact Us</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="faq-page-section">
+    <h2 class="faq-page-title">Common Questions</h2>
+
+    <details class="faq-page-item" open>
+      <summary>1. How do I sign in for the first time?</summary>
+      <p>
+        Use your national ID and the default password shared by school administration. After your first sign-in, update your password.
+        If your account is not active yet, contact the office so your role and profile can be confirmed.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>2. I forgot my password. What should I do?</summary>
+      <p>
+        Contact administration and request a password reset. For security, identity details may be verified before resetting access.
+        Avoid sharing passwords with classmates or other users.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>3. Why can I not see my classroom schedule?</summary>
+      <p>
+        Usually this means your profile is not linked to a class yet, or the class schedule has not been published.
+        Students can only view their own class schedule, while teachers and admins may edit assigned classes.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>4. Why is the schedule read-only for me?</summary>
+      <p>
+        Students and parents have read-only access. Editing is available to teachers assigned to that class and administrators.
+        If you are a teacher and still see read-only mode, check class assignment in the class details.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>5. How do teachers add homework?</summary>
+      <p>
+        Open the class detail page and use the <strong>Add Homework</strong> action. Fill in title and description, then submit.
+        Homework items appear immediately in the class homework section.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>6. Why does homework show a countdown timer?</summary>
+      <p>
+        Homework is tracked with a 24-hour activity window in the current setup. The timer is a live indicator of how much time is left
+        before the item reaches expiry behavior in the system.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>7. Can one class have more than one lesson per day?</summary>
+      <p>
+        Yes. The timetable supports day and period slots. Each class can set lessons for first, second, third, and fourth period.
+        Empty slots can remain empty and do not have to be filled.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>8. Who can see student information?</summary>
+      <p>
+        Access depends on role permissions. Teachers can view relevant students, admins have wider access for school operations,
+        and parents are limited to linked student records.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>9. Why are some actions blocked with a permission message?</summary>
+      <p>
+        The portal enforces role rules to protect data. If you see a permission warning, your current account role is not allowed
+        to perform that action. Request access changes through administration when appropriate.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>10. Can I use the system on mobile?</summary>
+      <p>
+        Yes. The interface is responsive and works on phones and tablets. For timetable editing, landscape mode on smaller screens
+        gives a better table view.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>11. How do I report a bug or wrong data?</summary>
+      <p>
+        Send the page link, your account role, and a screenshot to support using the contact channels on the Contact Us page.
+        Include exact steps so the issue can be reproduced quickly.
+      </p>
+    </details>
+
+    <details class="faq-page-item">
+      <summary>12. Where can I read more about school goals and values?</summary>
+      <p>
+        Visit the About Us page for mission, educational direction, and partnership approach with families.
+        You can also use Contact Us for direct questions.
+      </p>
+    </details>
+  </section>
+</section>
+{% endblock %}

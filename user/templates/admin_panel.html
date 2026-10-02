@@ -1,0 +1,271 @@
+{% extends 'base.html'%}{% block content %}
+<div class="panel-grid">
+  <div class="school-panel" style="grid-area: box-1">
+    <h1>School Information</h1>
+    <div class="status-grid">
+      <p>Total Students: <strong>{{ students|length }}</strong></p>
+      <p>Total Teachers: <strong>{{ teachers|length }}</strong></p>
+      <p>Total Classrooms: <strong>{{ classrooms|length }}</strong></p>
+      <p>Total Users: <strong>{{ users|length }}</strong></p>
+    </div>
+  </div>
+  <div class="messages-panel" style="grid-area: box-2">
+    <div class="panel-inner">
+      <form
+        action="{% url 'user:message_sender' %}"
+        method="post"
+        enctype="multipart/form-data"
+        class="message-form"
+      >
+        {% csrf_token %}
+        <h2>Send Message</h2>
+
+        <div class="form-group">
+          <h2>Sender : {{ request.user.full_name }}</h2>
+        </div>
+
+        <div class="form-group recipient-box">
+          <div class="recipient-box-head">
+            <label for="recipients">Recipients</label>
+            <span id="recipient-count" class="recipient-count">0 selected</span>
+          </div>
+          <p class="recipient-help">Search and select one or multiple users.</p>
+          <input
+            id="recipient-search"
+            type="search"
+            class="df-input recipient-search"
+            placeholder="Search recipients by name or id..."
+          />
+          <select
+            name="recipiant"
+            id="recipients"
+            multiple
+            required
+            class="df-input recipients-select"
+            size="8"
+          >
+            {% for user in users %}
+            <option value="{{ user.id }}">
+              {{ user.full_name }} {% if user.email %}({{ user.email }})
+              {%endif%}
+            </option>
+            {% endfor %}
+          </select>
+          <div class="recipient-actions">
+            <button type="button" id="select-all" class="df-btn recipient-btn">
+              Select Visible
+            </button>
+            <button
+              type="button"
+              id="clear-selection"
+              class="df-btn recipient-btn recipient-btn-muted"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              id="select-all-users"
+              class="df-btn recipient-btn"
+            >
+              All Users
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex: 2; min-width: 0">
+            <label for="subject">Subject</label>
+            <input
+              id="subject"
+              name="subject"
+              type="text"
+              class="df-input"
+              placeholder="Subject"
+            />
+          </div>
+
+          <div class="form-group" style="flex: 1; min-width: 0">
+            <label for="attachment">Attachment</label>
+            <input
+              id="attachment"
+              name="attachment"
+              type="file"
+              class="df-input"
+            />
+          </div>
+
+          <div
+            class="form-group"
+            style="
+              flex: 0.8;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              min-width: 0;
+            "
+          >
+            <input
+              id="is_announcement"
+              name="is_announcement"
+              type="checkbox"
+            />
+            <label for="is_announcement">Announcement</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="body">Message</label>
+          <textarea
+            id="body"
+            name="body"
+            class="df-input"
+            rows="4"
+            placeholder="Write your message..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="df-btn">Send Message</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="staff-list" style="grid-area: box-3">
+    <div class="panel-inner">
+      <h2>Staff Members</h2>
+      <div class="staff-scroll">
+        {% for staff in staffs %}
+        <div class="staff-item">
+          <p>{{ staff.full_name }}</p>
+          <span class="staff-role">Admin</span>
+        </div>
+        {% endfor %} {% for teacher in teachers %}
+        <div class="staff-item">
+          <p>{{ teacher.user.full_name }}</p>
+          <span class="staff-role">Teacher</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="log-container" style="grid-area: box-4">
+    <div class="panel-inner">
+      <h1>Activity Log</h1>
+
+      <div class="log-filters">
+        <form method="get" class="filter-form">
+          <label>From Date:</label>
+          <input type="date" name="date_from" value="{{ date_from }}" />
+
+          <label>To Date:</label>
+          <input type="date" name="date_to" value="{{ date_to }}" />
+
+          <button type="submit">Filter</button>
+        </form>
+      </div>
+
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Object</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td>{{ log.action_time|date:"Y-m-d H:i:s" }}</td>
+            <td>{{ log.user.full_name }}</td>
+            <td>
+              {% if log.action_flag == 1 %}Added {% elif log.action_flag == 2
+              %}Changed {% elif log.action_flag == 3 %}Deleted {% endif %}
+            </td>
+            <td>{{ log.content_type }}</td>
+            <td>{{ log.object_repr }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5">No logs found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<section class="send-messages">
+  {{user.sent_messages.count}} messages sent
+  <a href="{% url 'user:message_detail' .pk%}"
+    >View Messages
+    <div></div>
+  </a>
+</section>
+
+<script>
+  // Filter recipients in the multi-select
+  document.addEventListener("DOMContentLoaded", function () {
+    const search = document.getElementById("recipient-search");
+    const select = document.getElementById("recipients");
+    const selectAllBtn = document.getElementById("select-all");
+    const clearBtn = document.getElementById("clear-selection");
+    const allUsersBtn = document.getElementById("select-all-users");
+    const countEl = document.getElementById("recipient-count");
+
+    function updateCount() {
+      if (!select || !countEl) return;
+      const selected = Array.from(select.options).filter(
+        (opt) => opt.selected,
+      ).length;
+      countEl.textContent = `${selected} selected`;
+    }
+
+    if (search) {
+      search.addEventListener("input", function (e) {
+        const term = e.target.value.toLowerCase();
+        Array.from(select.options).forEach((opt) => {
+          const text = opt.text.toLowerCase();
+          opt.style.display = text.includes(term) ? "" : "none";
+        });
+      });
+    }
+
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener("click", function () {
+        Array.from(select.options).forEach((opt) => {
+          if (opt.style.display !== "none") opt.selected = true;
+        });
+        updateCount();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        Array.from(select.options).forEach((opt) => (opt.selected = false));
+        updateCount();
+      });
+    }
+
+    if (allUsersBtn) {
+      allUsersBtn.addEventListener("click", function () {
+        Array.from(select.options).forEach((opt) => {
+          opt.selected = true;
+          opt.style.display = "";
+        });
+        const s = document.getElementById("recipient-search");
+        if (s) s.value = "";
+        updateCount();
+      });
+    }
+
+    if (select) {
+      select.addEventListener("change", updateCount);
+      updateCount();
+    }
+  });
+</script>
+
+{% endblock %}

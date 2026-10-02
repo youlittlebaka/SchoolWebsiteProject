@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block content %}
+<h1 class="schedule-title">Weekly Lesson Schedule</h1>
+<div class="schedule-container">
+  <table class="schedule-table">
+    <thead>
+      <tr>
+        <th>Stage / Day</th>
+        {% for day in days %}
+        <th>{{ day.name }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for stage, lessons in week_schedule.items %}
+      <tr>
+        <td class="stage-name">{{ stage }}</td>
+        {% for lesson in lessons %}
+        <td class="lesson-cell">{{ lesson|default:"-" }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

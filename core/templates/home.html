@@ -1,0 +1,203 @@
+{% extends 'base.html'%}{% block content %}
+<section class="text-part-1">
+  <h1 class="school-title">Skylane Crest School</h1>
+  <h3 class="school-quote">Built on effort. Driven by purpose.</h3>
+</section>
+<header class="home-head">
+  <div class="welcome">
+    <h2>Welcome to our school community.</h2>
+    <p>
+      At Skylane Crest School, we believe every student can achieve meaningful
+      success when learning is supported by strong teaching, clear goals, and a
+      caring community. <br />
+      Our classrooms are built to encourage curiosity, discipline, and creative
+      thinking, while our teachers work closely with families to guide each
+      learner with personal attention and consistent feedback. <br />
+      From academic growth to character development, we are committed to helping
+      students become confident, responsible, and ready for the future.
+      <br />
+      Explore our programs, resources, and school updates to see how we support
+      every step of your child's journey.
+    </p>
+  </div>
+</header>
+<section class="home-stats" aria-label="School quick stats">
+  <article class="stat-card">
+    <p class="stat-value">1,240+</p>
+    <p class="stat-label">Active Students</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-value">96%</p>
+    <p class="stat-label">Attendance Rate</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-value">48</p>
+    <p class="stat-label">Qualified Teachers</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-value">18</p>
+    <p class="stat-label">Student Clubs</p>
+  </article>
+</section>
+<section class="principal-message" aria-label="Principal message">
+  <div class="principal-media">
+    <img
+      class="principal-photo"
+      src="/static/principal-photo.jpg"
+      alt="Portrait of the principal"
+    />
+  </div>
+  <div class="principal-content">
+    <p class="principal-kicker">A message from school leadership</p>
+    <h2>Dr. Sarah Ahmed, Principal</h2>
+    <p>
+      Every child who joins Skylane Crest School deserves a learning experience
+      that is both challenging and deeply supportive. Our commitment is to
+      create classrooms where students think critically, ask meaningful
+      questions, and grow with confidence through consistent guidance from
+      skilled teachers. We work as partners with families because long-term
+      student success is strongest when home and school move in the same
+      direction. Our mission is simple: help students build strong character,
+      academic excellence, and the practical skills they need to lead with
+      purpose in the future.
+    </p>
+    <a class="principal-cta" href="">Meet Our Leadership Team</a>
+  </div>
+</section>
+<section class="quick-nav">
+  <h2>Quick navigation menu</h2>
+  {% if user.is_authenticated %} {% if user.is_student%}
+  <a class="quick-nav-link" href="">my teacher</a>
+  <a class="quick-nav-link" href="{% url 'students:homework_view' %}"
+    >your homeworks</a
+  >
+  {% elif user.is_admin or user.is_superuser %}
+  <a class="quick-nav-link" href="{% url 'user:admin_panel' %}">admin panel</a>
+  <a class="quick-nav-link" href="{% url 'students:all_classes' %}">classes</a>
+  {% elif user.is_parent %}
+  <a href="">my student profile</a>
+  <a class="quick-nav-link" href="{% url 'students:my_children' %}"
+    >my student teacher</a
+  >
+  <a class="quick-nav-link" href="">my student homework</a>
+  {% elif user.is_teacher %}
+  <a class="quick-nav-link" href="{% url 'students:my_students' %}"
+    >your students info</a
+  >
+  <a class="quick-nav-link" href="{% url 'students:add_homework' %}"
+    >add home work to your classes</a
+  >
+  {% endif %} {% else %}
+  <a class="quick-nav-link" href="{% url 'user:login' %}">login</a>
+  {% endif %}
+  <a class="quick-nav-link" href="{% url 'core:contact_us' %}">contact info</a>
+  <a class="quick-nav-link" href="{% url 'core:about_us' %}">about us</a>
+  <a class="quick-nav-link" href="{% url 'core:help' %}">help</a>
+</section>
+
+<div class="text-part-2">
+  <img
+    class="school-logo"
+    src="/static/school-logo.svg"
+    alt="Skylane Crest School logo"
+  />
+  <p>
+    Welcome to our school, where every student is encouraged to learn with
+    confidence, kindness, and purpose. <br />
+    <br />
+    We believe strong relationships and high standards go hand in hand, and our
+    teachers work closely with families to support each learner’s growth. <br />
+    <br />
+    From engaging lessons to creative activities, we help students build skills,
+    character, and a lifelong love of learning. <br />
+    <br />
+    Explore our programs, meet our staff, and see how our community helps
+    students reach their full potential.
+  </p>
+</div>
+<section class="home-faq">
+  <h2>Common Questions</h2>
+
+  <details class="faq-item">
+    <summary>What are the school hours?</summary>
+    <p>
+      The regular school day starts at 8:00 AM and ends at 3:00 PM from Monday
+      to Friday. Students can arrive from 7:30 AM for supervised entry, and
+      after-school activities usually run until 4:30 PM. The front office is
+      open during school hours to support families with attendance, schedule
+      questions, and student services. If you need an early pickup, it is best
+      to notify the office in advance so your child can be prepared and the
+      dismissal process stays smooth and safe.
+    </p>
+  </details>
+
+  <details class="faq-item">
+    <summary>How can parents track homework and progress?</summary>
+    <p>
+      Parents can log in to the parent portal to view homework, attendance,
+      grades, and teacher notes. Progress reports are updated regularly, and
+      families are encouraged to check weekly for the latest updates. We also
+      share progress updates through term reports and parent-teacher meetings.
+      If a parent notices missing work or a drop in performance, they can
+      contact the class teacher to discuss a focused support plan, revision
+      materials, and realistic short-term goals for improvement.
+    </p>
+  </details>
+
+  <details class="faq-item">
+    <summary>How do I contact a teacher?</summary>
+    <p>
+      The fastest method is through the portal messaging section, where each
+      teacher has a direct contact option. You can also request a call or
+      meeting through the school office during working hours. Please include
+      your student name, class, and the main reason for your message so staff
+      can respond clearly and quickly. Teachers usually respond within one to
+      two school days. For urgent same-day issues, such as transportation or
+      pickup changes, call the office directly for immediate support.
+    </p>
+  </details>
+
+  <details class="faq-item">
+    <summary>
+      What support is available for students who need extra help?
+    </summary>
+    <p>
+      We provide classroom support, after-school academic sessions, and guided
+      study plans. Teachers identify learning needs early and coordinate with
+      families to create practical improvement goals. Support can include
+      small-group instruction, targeted reading and math practice, and
+      one-to-one check-ins for students who need extra guidance. Our goal is not
+      only to improve grades, but also to build confidence, consistency, and
+      effective learning habits that help students succeed in the long term.
+    </p>
+  </details>
+
+  <details class="faq-item">
+    <summary>How does attendance and absence reporting work?</summary>
+    <p>
+      If a student is absent, a parent or guardian should notify the school
+      office before 9:00 AM and submit a reason. Attendance is tracked daily,
+      and repeated absences trigger follow-up support from the school team.
+      Students are expected to complete missed classwork, and teachers help
+      prioritize tasks so students can catch up in a manageable way. Since
+      regular attendance strongly supports academic progress and social
+      development, we work closely with families whenever attendance patterns
+      become a concern.
+    </p>
+  </details>
+
+  <details class="faq-item">
+    <summary>How can students join school clubs and activities?</summary>
+    <p>
+      Students can review available clubs at the start of each term and sign up
+      through their class advisor or activity coordinator. Club schedules,
+      requirements, and participation limits are shared in advance. We offer a
+      range of options, including sports, arts, academic clubs, and service
+      activities, so students can explore interests beyond the classroom.
+      Participation helps students build leadership, teamwork, communication,
+      and confidence while forming stronger connections with the school
+      community.
+    </p>
+  </details>
+</section>
+{% endblock %}

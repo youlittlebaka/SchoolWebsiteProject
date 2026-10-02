@@ -1,0 +1,111 @@
+{% extends 'base.html' %} {% block content %}
+<section class="students-page">
+  <div class="students-toolbar">
+    <h1>All Students</h1>
+    <a class="df-btn add-student-btn" href="{% url 'user:add_user' %}"
+      >Add Student</a
+    >
+  </div>
+
+  <form class="students-search-form" method="get">
+    <input
+      id="studentSearch"
+      class="df-input students-search"
+      type="search"
+      name="q"
+      value="{{ q }}"
+      placeholder="Search by name, national ID, or phone"
+      autocomplete="off"
+    />
+  </form>
+
+  <div class="students-count">
+    <span id="visibleStudents">{{ students|length }}</span> student(s)
+  </div>
+
+  <div class="students-table-wrap">
+    <table class="students-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>National ID</th>
+          <th>Phone</th>
+          <th>Gender</th>
+          <th>Joined</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTableBody">
+        {% for student in students %}
+        <tr
+          class="student-row"
+          data-href="{% url 'user:user_detail' student.pk %}"
+          data-search="{{ student.full_name|lower }} {{ student.national_id|lower }} {{ student.phone|default:''|lower }} {{ student.home_phone|default:''|lower }}"
+        >
+          <td>
+            <a
+              class="student-name-link"
+              href="{% url 'user:user_detail' student.pk %}"
+              >{{ student.full_name }}</a
+            >
+          </td>
+          <td>{{ student.national_id }}</td>
+          <td>{{ student.phone|default:"-" }}</td>
+          <td>{{ student.gender|default:"-" }}</td>
+          <td>{{ student.date_joined|date:"Y-m-d" }}</td>
+          <td>
+            <a
+              class="student-detail-link"
+              href="{% url 'user:user_detail' student.pk %}"
+              >Open</a
+            >
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="students-empty">No students found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const searchInput = document.getElementById("studentSearch");
+    const tableBody = document.getElementById("studentsTableBody");
+    const countNode = document.getElementById("visibleStudents");
+    if (!searchInput || !tableBody || !countNode) return;
+
+    const rows = Array.from(tableBody.querySelectorAll(".student-row"));
+
+    function filterRows() {
+      const term = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+
+      rows.forEach((row) => {
+        const haystack = row.dataset.search || "";
+        const match = haystack.includes(term);
+        row.style.display = match ? "" : "none";
+        if (match) visible += 1;
+      });
+
+      countNode.textContent = String(visible);
+    }
+
+    searchInput.addEventListener("input", filterRows);
+
+    rows.forEach((row) => {
+      row.addEventListener("click", function (event) {
+        const target = event.target;
+        if (target.closest("a")) return;
+        const href = row.dataset.href;
+        if (href) window.location.href = href;
+      });
+    });
+
+    filterRows();
+  })();
+</script>
+{% endblock %}

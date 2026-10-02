@@ -1,0 +1,113 @@
+{% extends 'base.html' %} {% block content %}
+<h1 style="text-align: center">Weblog</h1>
+<div class="weblog-page-grid">
+  <div class="weblog-list" id="weblog-list">
+    <div class="weblog-actions">
+      {% if user.role == 'admin' or user.role == 'teacher' %}
+      <a class="weblog-link" href="{% url 'weblog:weblog_create' %}"
+        >Create New Post</a
+      >
+      {% endif %}
+      <input
+        type="text"
+        id="weblog-live-search"
+        placeholder="Live search posts..."
+        class="weblog-search"
+      />
+    </div>
+    <div class="weblog-grid">
+      {% for weblog in weblog %} {% if weblog.published %}
+      <div
+        class="weblog-items"
+        data-created-date="{{ weblog.created_at|date:'Y-m-d' }}"
+        data-author="{{ weblog.author.username|lower }}"
+        data-category="{{ weblog.category|default:''|lower }}"
+      >
+        {% if weblog.file %}
+        <div class="weblog-image-wrap">
+          <img
+            src="{{ weblog.file.url }}"
+            alt="Weblog Image"
+            class="weblog-image"
+          />
+        </div>
+        {% endif %}
+
+        <a
+          class="weblog-title-link"
+          href="{% url 'weblog:weblog_detail' weblog.pk %}"
+          >{{ weblog.title }}</a
+        >
+        <p>{{ weblog.content|truncatechars:100 }}</p>
+        <p>Author: {{ weblog.author.full_name }}</p>
+        <p>Category: {{ weblog.get_category_display|default:'-' }}</p>
+        <p>Created at: {{ weblog.created_at }}</p>
+      </div>
+      {% endif %} {% empty %}
+      <div class="weblog-none">
+        <p>No posts found.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="filter-box">
+    <div class="filter-items">
+      <h3>Filter Posts</h3>
+      <label for="filter-date">Date</label>
+      <input type="date" id="filter-date" />
+      <label for="filter-author">Author</label>
+      <input
+        type="text"
+        id="filter-author"
+        placeholder="Type author username"
+      />
+
+      <label for="filter-category">Category</label>
+      <select id="filter-category">
+        <option value="">All</option>
+        <option value="announcement">Announcement</option>
+        <option value="news">News</option>
+        <option value="event">Event</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const dateInput = document.getElementById("filter-date");
+    const authorInput = document.getElementById("filter-author");
+    const categoryInput = document.getElementById("filter-category");
+    const liveSearchInput = document.getElementById("weblog-live-search");
+    const items = Array.from(document.querySelectorAll(".weblog-items"));
+
+    function applyFilters() {
+      const dateValue = dateInput.value;
+      const authorValue = authorInput.value.trim().toLowerCase();
+      const categoryValue = categoryInput.value.toLowerCase();
+      const queryValue = liveSearchInput.value.trim().toLowerCase();
+
+      items.forEach((item) => {
+        const itemDate = item.dataset.createdDate || "";
+        const itemAuthor = item.dataset.author || "";
+        const itemCategory = item.dataset.category || "";
+        const itemText = item.innerText.toLowerCase();
+
+        const matchDate = !dateValue || itemDate === dateValue;
+        const matchAuthor = !authorValue || itemAuthor.includes(authorValue);
+        const matchCategory = !categoryValue || itemCategory === categoryValue;
+        const matchQuery = !queryValue || itemText.includes(queryValue);
+
+        item.style.display =
+          matchDate && matchAuthor && matchCategory && matchQuery ? "" : "none";
+      });
+    }
+
+    dateInput.addEventListener("input", applyFilters);
+    authorInput.addEventListener("input", applyFilters);
+    categoryInput.addEventListener("change", applyFilters);
+    liveSearchInput.addEventListener("input", applyFilters);
+  })();
+</script>
+{% endblock %}

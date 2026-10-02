@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>base</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  </head>
+  <body>
+    <button
+      class="sidebar-toggle"
+      id="sidebarToggle"
+      aria-controls="sidebar"
+      aria-expanded="false"
+      type="button"
+    >
+      menu
+    </button>
+    <div class="layout-shell" id="layoutShell">
+      <aside class="sidebar" id="sidebar">
+        <h3 class="title">reach your goal with us</h3>
+        <nav class="nav-links">
+          <a class="nav-link" href="{% url 'core:home'%}">home</a>
+          {% if user.is_authenticated %} {% if user.is_student%}
+          <a class="nav-link" href="{% url 'user:profile'%}">profile</a>
+          <a class="nav-link" href="{% url 'students:classroom'%}">class</a>
+          <a class="nav-link" href="{% url 'user:logout'%}">logout</a>
+          {% elif user.is_admin or user.is_superuser %}
+          <a class="nav-link" href="{% url 'user:profile'%}">profile</a>
+          <a class="nav-link" href="{% url 'students:all_classrooms'%}"
+            >classes</a
+          >
+          <a class="nav-link" href="{% url 'user:all_students'%}">studnets</a>
+          <a class="nav-link" href="{% url 'user:logout'%}">logout</a>
+          {% elif user.is_parent %}
+          <a class="nav-link" href="{% url 'user:my_student'%}">my student</a>
+          <a class="nav-link" href="{% url 'user:profile'%}">profile</a>
+          <a class="nav-link" href="{% url 'user:logout'%}">logout</a>
+          {% elif user.is_teacher %}
+          <a class="nav-link" href="{% url 'user:profile'%}">profile</a>
+          <a class="nav-link" href="{% url 'user:my_classes'%}">my classes</a>
+          <a class="nav-link" href="{% url 'user:logout'%}">logout</a>
+          {% endif %} {% else %}
+          <a class="nav-link" href="{% url 'user:auth_page'%}">login</a>
+          {% endif %}
+          <a class="nav-link" href="{% url 'weblog:weblog' %}">weblog</a>
+          <a class="nav-link" href="{% url 'core:help' %}">help</a>
+        </nav>
+      </aside>
+      <main class="page-content">{% block content %}{% endblock %}</main>
+    </div>
+    {% if messages %}
+    <div id="popup-messages">
+      {% for message in messages %}
+      <div class="popup-message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <!-- Message Circle -->
+    <div class="msg-fab" id="msgFab">
+      <span class="msg-count" id="msgCount">0</span>
+      ✉
+    </div>
+
+    <!-- Inbox Panel -->
+    <div class="inbox-panel" id="inboxPanel">
+      <div class="inbox-header">
+        <h3>Inbox</h3>
+        <button id="closeInbox">✕</button>
+      </div>
+
+      <div class="inbox-list" id="inboxList">
+        <div class="inbox-loading">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div class="msg-modal" id="msgModal">
+      <div class="msg-modal-card">
+        <div class="msg-modal-header">
+          <h3 id="modalSubject"></h3>
+          <button id="closeModal">✕</button>
+        </div>
+
+        <div class="msg-modal-meta" id="modalMeta"></div>
+
+        <div class="msg-modal-body" id="modalBody"></div>
+
+        <a id="modalAttachment" class="msg-attachment" target="_blank"></a>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const INBOX_API = "{% url 'user:inbox_api' %}";
+
+        const fab = document.getElementById("msgFab");
+        const inbox = document.getElementById("inboxPanel");
+        const closeInbox = document.getElementById("closeInbox");
+        const inboxList = document.getElementById("inboxList");
+
+        const modal = document.getElementById("msgModal");
+        const modalSubject = document.getElementById("modalSubject");
+        const modalMeta = document.getElementById("modalMeta");
+        const modalBody = document.getElementById("modalBody");
+        const modalAttachment = document.getElementById("modalAttachment");
+
+        if (!fab || !inbox || !inboxList) return;
+
+        fab.addEventListener("click", () => {
+          inbox.classList.add("open");
+          loadInbox();
+        });
+
+        closeInbox?.addEventListener("click", () =>
+          inbox.classList.remove("open"),
+        );
+        document
+          .getElementById("closeModal")
+          ?.addEventListener("click", () => modal.classList.remove("open"));
+
+        async function loadInbox() {
+          try {
+            inboxList.innerHTML = '<div class="inbox-loading">Loading...</div>';
+
+            const res = await fetch(INBOX_API, { credentials: "same-origin" });
+            if (!res.ok) throw new Error("Inbox API error");
+
+            const data = await res.json();
+
+            document.getElementById("msgCount").innerText = data.unread || 0;
+
+            if (!data.messages.length) {
+              inboxList.innerHTML =
+                '<div class="inbox-empty">No messages</div>';
+              return;
+            }
+
+            inboxList.innerHTML = data.messages
+              .map(
+                (m) => `
+            <div class="inbox-item ${m.is_read ? "" : "unread"}"
+                data-id="${m.id}">
+                <div class="inbox-title">${m.subject}</div>
+                <div class="inbox-date">${m.date}</div>
+            </div>
+          `,
+              )
+              .join("");
+
+            document.querySelectorAll(".inbox-item").forEach((item) => {
+              item.addEventListener("click", () =>
+                openMessage(item.dataset.id),
+              );
+            });
+          } catch (err) {
+            console.error("Inbox load failed:", err);
+            inboxList.innerHTML =
+              '<div class="inbox-error">Failed to load messages</div>';
+          }
+        }
+
+        async function openMessage(id) {
+          try {
+            const res = await fetch(`/users/inbox/${id}/`, {
+              credentials: "same-origin",
+            });
+
+            if (!res.ok) throw new Error("Message API error");
+
+            const m = await res.json();
+
+            modalSubject.innerText = m.subject;
+            modalMeta.innerText = `From ${m.sender} • ${m.date}`;
+            modalBody.innerText = m.body;
+
+            if (m.attachment) {
+              modalAttachment.style.display = "inline-block";
+              modalAttachment.href = m.attachment;
+              modalAttachment.innerText = "Download attachment";
+            } else {
+              modalAttachment.style.display = "none";
+            }
+
+            modal.classList.add("open");
+            loadInbox();
+          } catch (err) {
+            console.error("Message load failed:", err);
+          }
+        }
+      });
+    </script>
+
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+      const layoutShell = document.getElementById("layoutShell");
+      if (sidebar && sidebarToggle && layoutShell) {
+        sidebarToggle.addEventListener("click", function () {
+          const isOpen = sidebar.classList.toggle("is-open");
+          layoutShell.classList.toggle("sidebar-open", isOpen);
+          sidebarToggle.setAttribute(
+            "aria-expanded",
+            isOpen ? "true" : "false",
+          );
+        });
+
+        document.addEventListener("click", function (event) {
+          const clickedOutside =
+            !sidebar.contains(event.target) &&
+            !sidebarToggle.contains(event.target);
+          if (sidebar.classList.contains("is-open") && clickedOutside) {
+            sidebar.classList.remove("is-open");
+            layoutShell.classList.remove("sidebar-open");
+            sidebarToggle.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+
+      const popups = document.querySelectorAll(".popup-message");
+      popups.forEach(function (popup) {
+        // Remove after 10 seconds
+        setTimeout(() => {
+          popup.style.opacity = "0";
+          setTimeout(() => popup.remove(), 300);
+        }, 10000);
+        // Remove on click
+        popup.addEventListener("click", function () {
+          popup.style.opacity = "0";
+          setTimeout(() => popup.remove(), 300);
+        });
+      });
+
+      const introSection = document.querySelector(".text-part-1");
+      if (introSection) {
+        introSection.addEventListener("animationend", function (event) {
+          if (event.animationName === "fade-out") {
+            introSection.classList.add("is-hidden");
+          }
+        });
+      }
+    </script>
+    <script>
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+      window.addEventListener("load", () => {
+        window.scrollTo(0, 0);
+      });
+    </script>
+  </body>
+</html>

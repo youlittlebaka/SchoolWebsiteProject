@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="info-page">
+  <div class="info-hero">
+    <img src="{% static 'images/about-hero.svg' %}" alt="About our school" class="info-hero-image" />
+    <div>
+      <p class="info-kicker">Who We Are</p>
+      <h1 class="info-title">About Us</h1>
+      <p class="info-lead">
+        Our school is built around one goal: helping every student grow with confidence, discipline, and practical knowledge.
+        We combine academic foundations with social and personal development so learning remains meaningful beyond exams.
+      </p>
+      <div class="info-links">
+        <a class="info-link" href="{% url 'core:help' %}">Help</a>
+        <a class="info-link" href="{% url 'core:contact_us' %}">Contact Us</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="info-card-grid">
+    <article class="info-card">
+      <h2>Our Mission</h2>
+      <p>
+        We aim to deliver a learning environment where students understand concepts deeply and apply them responsibly.
+        Our mission includes academic excellence, ethical behavior, and community engagement. We guide students to ask
+        better questions, collaborate respectfully, and build habits that support lifelong learning.
+      </p>
+      <p>
+        We believe education is not only about grades. It is about character, communication, accountability, and the ability
+        to solve real problems. For this reason, our programs are designed to balance structured instruction with active participation.
+      </p>
+    </article>
+
+    <article class="info-card">
+      <h2>Our Vision</h2>
+      <p>
+        Our vision is to become a trusted school community where every learner has access to organized support and clear guidance.
+        We want students to graduate with strong academic foundations and the confidence to navigate university, careers, and civic life.
+      </p>
+      <p>
+        We continue improving teaching methods, digital tools, and communication with parents so school operations stay transparent and effective.
+        The portal you are using is part of that effort: one place for schedule, homework, and academic coordination.
+      </p>
+    </article>
+
+    <article class="info-card">
+      <h2>Teaching Approach</h2>
+      <p>
+        Our teachers focus on clarity first. Lessons are planned by day and period to avoid confusion and maintain continuity across classes.
+        Homework is assigned with clear expectations and practical relevance, helping students reinforce what was learned in class.
+      </p>
+      <p>
+        We promote respectful classroom culture, constructive feedback, and regular follow-up. Teachers and administration cooperate closely
+        to identify challenges early and provide support before small issues become major obstacles.
+      </p>
+    </article>
+
+    <article class="info-card">
+      <h2>Family Partnership</h2>
+      <p>
+        Families are essential partners in student success. We encourage parents to review schedules, homework progress, and communication updates regularly.
+        Consistent family-school collaboration helps students stay focused and improves attendance, motivation, and responsibility.
+      </p>
+      <p>
+        We maintain open communication channels and welcome constructive feedback. If a concern appears, we recommend contacting the school early
+        so it can be addressed with clarity and care.
+      </p>
+    </article>
+  </section>
+</section>
+{% endblock %}
